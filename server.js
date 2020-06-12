@@ -5,14 +5,25 @@ const morgan = require("morgan");
 // load dotenv file 
 dotenv.config({path: './config/config.env'});
 
+// route files
+const tourRoute = require("./routes/tourroutes");
+const userRoute = require("./routes/userroutes");
+
+
 
 const app = express(); 
 app.use(express.json()); // body parser
+
 
 // adding morgan logger
 if (process.env.NODE_ENV ==='development') {
     app.use(morgan('dev'));
 }
+
+
+// mount routes
+//app.use('/api/v1/tour', tourRoute);
+//app.use('api/v1/users', userRoute);
 
 // setting up the server
 const PORT = process.env.PORT || 4000
