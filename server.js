@@ -1,6 +1,7 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const morgan = require("morgan");
+const connectDB = require("./config/db");
 
 // load dotenv file 
 dotenv.config({path: './config/config.env'});
@@ -14,6 +15,8 @@ const userRoute = require("./routes/userroutes");
 const app = express(); 
 app.use(express.json()); // body parser
 
+// connection to db
+connectDB();
 
 // adding morgan logger
 if (process.env.NODE_ENV ==='development') {
