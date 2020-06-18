@@ -16,8 +16,9 @@ rating: {
     type: Number,
     default: 4.5
 }
+    
+});
 
-})
 
 
 module.exports = mongoose.model('Tour', tourSchema);
