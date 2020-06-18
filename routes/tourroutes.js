@@ -1,5 +1,15 @@
 const express = require("express");
-const tourRouter = express.Router();
+const router = express.Router();
+
+const { creatTour, getTours,
+         getTour, updateTour, 
+         deleteTour } = require("../controllers/tourController");
+
+router.post('/newTour', creatTour);
+router.get('/tours', getTours);
+router.get('/:id', getTour);
+router.put('/:id', updateTour );
+router.delete('/:id', deleteTour);
 
 
 
@@ -14,6 +24,4 @@ const tourRouter = express.Router();
 
 
 
-
-
-module.exports = tourRouter;
+module.exports = router;

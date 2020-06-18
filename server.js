@@ -11,12 +11,13 @@ const tourRoute = require("./routes/tourroutes");
 const userRoute = require("./routes/userroutes");
 
 
+// connection to db
+connectDB();
 
 const app = express(); 
 app.use(express.json()); // body parser
+app.use(express.urlencoded({ extended: false }));
 
-// connection to db
-connectDB();
 
 // adding morgan logger
 if (process.env.NODE_ENV ==='development') {
@@ -25,7 +26,7 @@ if (process.env.NODE_ENV ==='development') {
 
 
 // mount routes
-//app.use('/api/v1/tour', tourRoute);
+app.use('/api/v1/tour', tourRoute);
 //app.use('api/v1/users', userRoute);
 
 // setting up the server
