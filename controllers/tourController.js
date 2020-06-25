@@ -1,8 +1,8 @@
 const Tour = require("../model/tour");
+const ApiFeatures = require("../util/apiFeatures");
 
 
-
-// desc create a tour
+// @desc create a tour
 exports.creatTour = async(req, res) => {
     try {
 
@@ -17,57 +17,40 @@ exports.creatTour = async(req, res) => {
     }
 }
 
-// desc retrieve all tours
-exports.getTours = async(req, res) => {
-    try {
-// FILTER
+// @desc retrive the best and cheapest top 5 tours
 
-      const queryObj = {...req.query};
-      const exclude = ['page', 'sort', 'limit', 'fields'];
-
-      exclude.forEach(el => delete queryObj[el]);
-
-    
-
-
-      // ADVANCED FILTER
-
-      let queryStr = JSON.stringify(queryObj);
-
-      queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g,  match => `$${match}`); // regex to add gt-greater than functionalities
-     
-      let query =  Tour.find(JSON.parse(queryStr));
-
-      // sorting
-      if (req.query.sort) {
-        const sortBy = req.query.sort.split(',').join(' ');
-        query = query.sort(sortBy);
-      } else {
-        query = query.sort('-createdAt'); // sort so that the newest created ones comes first
-      }
-
-      // fields limiting 
-      if (req.query.fields) {
-        const fields = req.query.fields.split(',').join(' ');
-        query = query.select(fields);
-      } else {
-        query = query.select('-__v'); // exclude __v
-      }
-
-
-
-
-
-        const tours = await query;
-        res
-        .status(200)
-        .json({ status: 'success', result: tours.length, data: tours});
-
-        
-    } catch (err) {
-        res.status(400).json({ error: err.message});
-    }
+exports.top5 = (req, res, next) => {
+  req.query.limit = '5';
+  req.query.sort = 'price,-ratingsAverage';
+  req.query.fields = 'name,duration,difficulty,price,ratingsAverage,summary,description';
+  next()
 }
+
+
+// @desc retrieve all tours
+exports.getTours = async(req, res) => {
+  try {
+
+    // Execute query
+    const features = new ApiFeatures(Tour.find(), req.query)
+    .filter()
+    .sort()
+    .limitField()
+    .pagination();
+
+      const tours = await features.query;
+      res
+      .status(200)
+      .json({ status: 'success', result: tours.length, data: tours});
+
+      
+  } catch (err) {
+      res.status(400).json({ error: err.message});
+  }
+}
+
+
+
 //@ desc retrive a tour
 exports.getTour = async(req, res) =>{
     try {
