@@ -1,5 +1,6 @@
 const Tour = require("../model/tour");
 const ApiFeatures = require("../util/apiFeatures");
+const { trace } = require("../routes/tourroutes");
 
 
 // @desc create a tour
@@ -76,7 +77,7 @@ exports.updateTour = async (req, res) => {
     } catch (err) {
       res.status(404).json({
         status: 'fail',
-        message: err
+        Error: err
       });
     }
   };
@@ -91,7 +92,7 @@ exports.deleteTour = async(req, res) => {
 
     res.status(404).json({
       status: 'fail',
-      message: err.message
+      Error: err.message
     });
     
   }
@@ -108,7 +109,7 @@ exports.getStat = async( req, res) => {
 
       {
         $group: {
-          _id: '$ratingsAverage',
+          _id: '$difficulty',
           numTours: { $sum: 1},
           totalPrice: { $sum: '$price'},
           avgRating: { $avg: '$ratingsAverage'},
@@ -133,9 +134,64 @@ exports.getStat = async( req, res) => {
   } catch (err) {
     res.status(404).json({
       status: 'fail',
-      message: err.message
+      Error: err.message
     });
     
   }
 
+};
+
+exports.getMonthlyPlan = async (req, res) => {
+  try {
+    const year = req.params.year * 1; // 2021
+
+    const plan = await Tour.aggregate([
+      {
+        $unwind: '$startDate'
+      },
+      {
+        $match: {
+          startDate: {
+            $gte: new Date(`${year}-01-01`),
+            $lte: new Date(` ${year}-12-31`)
+          }
+        }
+      },
+      {
+        $group: {
+          _id: { $month: '$startDate'},
+          numTourStart: { $sum: 1},
+          tours: { $push: '$name'}
+    
+        }
+      },
+      {
+        $addFields: { month: '$_id' }
+      },
+      {
+        $project: {
+          _id: 0
+        }
+      },
+      {
+        $sort: {
+          numTourStart: -1
+        }
+      }
+      
+    ]);
+
+  // send response
+    res.status(200).json({
+      status: 'success',
+      data: {
+        plan
+      }
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: 'fail',
+      Error: err.message
+    });
+  }
 };
