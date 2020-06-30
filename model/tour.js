@@ -1,12 +1,15 @@
 const mongoose = require("mongoose");
 const slugify = require("slugify");
+const validate = require("validator");
+const { default: validator } = require("validator");
 
 const tourSchema = new mongoose.Schema({
 name: {
     type: String,
     unique: true,
     trim: true,
-    required: [true, 'tour name is required']
+    required: [true, 'tour name is required'],
+   
 },
 
 duration: {
@@ -51,11 +54,12 @@ Discount: {
     type: Number,
     validate: {
         validator: function(value){
+
             return value < this.price // return the value only when price is greater than discount
 
         },
         message: 'Discount can not be greater than the regular price'
-        
+
     }
 },
 slug: String,
