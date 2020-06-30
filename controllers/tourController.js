@@ -1,6 +1,5 @@
 const Tour = require("../model/tour");
 const ApiFeatures = require("../util/apiFeatures");
-const { trace } = require("../routes/tourroutes");
 
 
 // @desc create a tour
