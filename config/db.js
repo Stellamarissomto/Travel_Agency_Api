@@ -1,8 +1,9 @@
 const mongoose = require('mongoose');
 
 
+
 const connectDB = async() => {
-    const conn = await mongoose.connect("mongodb+srv://tourapp:JomPoxyBMYUF5MmZ@cluster0-gmhf1.mongodb.net/tourapp?retryWrites=true&w=majority", {
+    const conn = await mongoose.connect( process.env.DB, {
         useNewUrlParser: true,
         useCreateIndex: true,
         useFindAndModify: false,

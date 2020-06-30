@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const slugify = require("slugify");
 
 const tourSchema = new mongoose.Schema({
 name: {
@@ -28,20 +29,36 @@ price: {
 
 difficulty: {
     type: String,
+    enum: {
+         values:  ['easy', 'medium', 'difficult'],
+         message: 'Difficulty can only be set to easy, medium and difficuly'
+},
     required: [true, 'Tour difficulty is required']
 },
 
 ratingsAverage: {
     type: Number,
-    default: 4.5
+    default: 4.5,
+    min: [1, 'Rating must not be below 1.0'],
+    max: [5, 'Rating must not be above 5']
 },
 ratingsQuantity: {
     type: Number,
     default: 0
 },
 
-Discount: Number,
+Discount: {
+    type: Number,
+    validate: {
+        validator: function(value){
+            return value < this.price // return the value only when price is greater than discount
 
+        },
+        message: 'Discount can not be greater than the regular price'
+        
+    }
+},
+slug: String,
 summary: {
     type: String,
     required: [true, 'Tour description is required'],
@@ -66,11 +83,35 @@ createdAt: {
     select: false
 },
 
-startDate: [Date]
+startDate: [Date],
+secretTour: {
+    type: Boolean,
+    default: false
+},
+},
+{
+    toJSON: { virtuals: true},
+    toObject: { virtual: true}
+}
 
-    
+);
+
+tourSchema.virtual('durationWeek').get( function(){
+    return this.duration / 7;
+
 });
 
+// ocument middleware that rus b4 .save() or .create
+tourSchema.pre('save', function(next) {
+ this.slug = slugify(this.name, { lower: true});
 
+ next();   
+});
+
+// query middleware
+tourSchema.pre(/^find/, function(next) {
+    this.find({ secretTour: { $ne: true}});
+    next();
+})
 
 module.exports = mongoose.model('Tour', tourSchema);
