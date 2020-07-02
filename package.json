@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "start": "SET NODE_ENV=production & nodemon server.js",
-    "dev": "nodemon server"
+    "dev": "nodemon server",
+    "debug": "ndb server.js"
   },
   "author": "ikeonyia somto",
   "license": "ISC",
